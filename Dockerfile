@@ -1,15 +1,15 @@
 FROM redis:alpine
 
-EXPOSE 6379
+RUN apk --no-cache add bash rsync \
+	&& date -Iseconds && env
+
+COPY healthcheck.sh /usr/local/bin/container-healthcheck
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
+	CMD ["container-healthcheck"]
 
 LABEL gurumojo.service=redis
 
 ENV POLL_TIMEOUT 100
 
-HEALTHCHECK --interval=10s \
-	--timeout=3s \
-	--retries=3 \
-	CMD curl -f http://localhost:80/
-
-RUN apk --no-cache add rsync &&\
-	env && date
+EXPOSE 6379
